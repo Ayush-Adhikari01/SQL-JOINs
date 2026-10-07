@@ -108,17 +108,17 @@ npm run build
 ```
 
 ---
-
-## 📋 Evaluation Rubric Alignment (10 Marks)
-1. **Problem Understanding (1 Mark):** Directly addresses abstract relational concepts with visual record mapping.
-2. **Website (2 Marks):** Complete modern React SPA with Day/Night theming and responsive design.
-3. **UX (1 Mark):** Clean feedback, provenance badges, search filters, and smooth modal editors.
-4. **Implementation (1 Mark):** Pure JavaScript relational engine supporting 7 join operations.
-5. **Testing (1 Mark):** Built-in automated test suite covering 11 critical edge cases.
-6. **Project Progress (1 Mark):** Modular architecture with separation of UI, engine, sample data, and exporters.
-7. **Demo & Explanation (1 Mark):** Step-by-step stepper and Learn page covering syllabus topics A–O.
-8. **Creativity (1 Mark):** Interactive row provenance, Venn diagrams, and Practice Quiz game.
-9. **Innovation (1 Mark):** Instant client-side PDF execution report generation with team branding.
+w
+## Evaluation Rubric Alignments
+1. **Problem Understanding :** Directly addwresses abstract relational concepts with visual record mapping.
+2. **Website :** Complete modern React SPA with Day/Night theming and responsive design.
+3. **UX :** Clean feedback, provenance badges, search filters, and smooth modal editors.
+4. **Implementation :** Pure JavaScript relational engine supporting 7 join operations.
+5. **Testing :** Built-in automated test suite covering 11 critical edge cases.
+6. **Project Progress :** Modular architecture with separation of UI, engine, sample data, and exporters.
+7. **Demo & Explanation :** Step-by-step stepper and Learn page covering syllabus topics A–O.
+8. **Creativity :** Interactive row provenance, Venn diagrams, and Practice Quiz game.
+9. **Innovation :** Instant client-side PDF execution report generation with team branding.
 
 ---
 
