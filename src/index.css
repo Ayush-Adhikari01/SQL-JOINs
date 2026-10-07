@@ -1,0 +1,369 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --primary-r: 59;
+    --primary-g: 130;
+    --primary-b: 246;
+    --color-primary: #3B82F6;
+    --color-primary-glow: rgba(59, 130, 246, 0.3);
+
+    --accent-r: 139;
+    --accent-g: 92;
+    --accent-b: 246;
+    --color-accent: #8B5CF6;
+    --color-accent-glow: rgba(139, 92, 246, 0.3);
+
+    /* Light Academic Palette (Clean, Soft Contrast, Crisp Whites) */
+    --bg-app: #F7F8FC;
+    --bg-page: #F7F8FC;
+    --bg-navbar: #FFFFFF;
+    --bg-surface: #FFFFFF;
+    --bg-secondary-card: #F8FAFC;
+    --bg-elevated: #F1F4F9;
+    --bg-card-elevated: #FFFFFF;
+    --bg-input: #FFFFFF;
+    --bg-table: #FFFFFF;
+    --bg-table-header: #F1F4F9;
+    --bg-hover: #E8EEF8;
+    --text-main: #111111;
+    --text-muted: #4B5563;
+    --border-subtle: #E2E8F0;
+    --border-strong: #CBD5E1;
+    --table-row-alt: rgba(241, 244, 249, 0.6);
+
+    /* Semantic Join & RGB Accents */
+    --semantic-match: #06B6D4;          /* Cyan */
+    --semantic-unmatched-left: #F59E0B;  /* Amber / Gold */
+    --semantic-unmatched-right: #EC4899; /* Magenta */
+    --semantic-null: #94A3B8;           /* Gray */
+    --semantic-active: #8B5CF6;         /* Violet */
+    --semantic-success: #22C55E;        /* Green */
+    --semantic-error: #EF4444;          /* Red */
+
+    /* Ambient RGB Lighting Opacities */
+    --ambient-blue-opacity: 0.07;
+    --ambient-purple-opacity: 0.06;
+    --ambient-gold-opacity: 0.05;
+    --ambient-cyan-opacity: 0.05;
+    --ambient-magenta-opacity: 0.04;
+  }
+
+  :root.dark {
+    /* STRICT PURE BLACK #000000 BASE CANVAS (ZERO HAZE / ZERO GRADIENT) */
+    --bg-app: #000000;                   /* Body: #000000 */
+    --bg-page: #000000;                  /* Page background: #000000 */
+    --bg-navbar: #000000;                /* Navbar: #000000 */
+    --bg-surface: #0A0A0A;               /* Main Card Interior: #0A0A0A */
+    --bg-secondary-card: #0F0F0F;        /* Secondary Card: #0F0F0F */
+    --bg-elevated: #141414;              /* Elevated Card: #141414 */
+    --bg-card-elevated: #141414;
+    --bg-input: #101010;                 /* Input: #101010 */
+    --bg-table: #080808;                 /* Table: #080808 */
+    --bg-table-header: #121212;          /* Table Header: #121212 */
+    --bg-hover: rgba(255, 255, 255, 0.04);
+    --text-main: #F5F5F5;                /* Primary Text: #F5F5F5 */
+    --text-muted: #A3A3A3;               /* Secondary Text: #A3A3A3 */
+    --border-subtle: #242424;            /* Border: #242424 */
+    --border-strong: #333333;
+    --table-row-alt: rgba(18, 18, 18, 0.7);
+  }
+
+  /* Academic Typography: Times New Roman globally */
+  html, body {
+    font-family: "Times New Roman", Times, "Liberation Serif", serif;
+    background-color: var(--bg-app);
+    color: var(--text-main);
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    overflow-x: hidden;
+  }
+
+  /* Code / SQL components retain clean monospaced font */
+  code, kbd, samp, pre, .font-mono {
+    font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+  }
+}
+
+/* ============================================================== */
+/* ANIMATED RGB PERIMETER BORDER (MOVING GRADIENT AROUND EDGES ONLY) */
+/* Cycles smoothly: BLUE -> CYAN -> VIOLET -> MAGENTA -> GOLD -> BLUE */
+/* Interior remains dark (#0A0A0A). Subtle outer glow. */
+/* ============================================================== */
+@keyframes rgbPerimeterSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rgbGradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 1. Core Animated RGB Border Wrapper for Cards */
+.rgb-card-perimeter {
+  position: relative;
+  border-radius: 1.5rem; /* 24px */
+  padding: 1.5px; /* Thin, sharp glowing border */
+  overflow: hidden;
+  background: conic-gradient(
+    from 0deg,
+    #3B82F6,  /* Electric Blue */
+    #06B6D4,  /* Cyan */
+    #8B5CF6,  /* Violet */
+    #EC4899,  /* Magenta */
+    #F59E0B,  /* Gold */
+    #3B82F6   /* Back to Electric Blue */
+  );
+  transition: transform 250ms ease, box-shadow 250ms ease;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.12);
+}
+
+.rgb-card-perimeter::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    #3B82F6 0deg,
+    #06B6D4 72deg,
+    #8B5CF6 144deg,
+    #EC4899 216deg,
+    #F59E0B 288deg,
+    #3B82F6 360deg
+  );
+  animation: rgbPerimeterSpin 10s linear infinite;
+  z-index: 0;
+  will-change: transform;
+}
+
+.rgb-card-perimeter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(6, 182, 212, 0.28);
+}
+
+.rgb-card-perimeter:active {
+  box-shadow: 0 0 34px rgba(139, 92, 246, 0.4);
+}
+
+/* Inner surface ensures interior stays strictly dark / theme-appropriate */
+.rgb-card-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(1.5rem - 1.5px);
+  background-color: var(--bg-surface);
+}
+
+/* Light mode version of the RGB perimeter */
+:root.light .rgb-card-perimeter {
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.08);
+  opacity: 0.95;
+}
+
+:root.light .rgb-card-perimeter:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.18);
+}
+
+/* 2. Interactive Animated Perimeter for Active JOIN Pill */
+.rgb-active-join-pill {
+  position: relative;
+  z-index: 1;
+  background-size: 250% 250%;
+  animation: rgbGradientShift 7s ease infinite;
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.rgb-active-join-pill:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
+}
+
+/* Specific operation gradient borders */
+.rgb-join-inner {
+  background: linear-gradient(135deg, #3B82F6, #06B6D4, #8B5CF6);
+  background-size: 200% 200%;
+}
+
+.rgb-join-left {
+  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background-size: 200% 200%;
+}
+
+.rgb-join-right {
+  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  background-size: 200% 200%;
+}
+
+.rgb-join-full {
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899);
+  background-size: 200% 200%;
+}
+
+.rgb-join-cross {
+  background: linear-gradient(135deg, #06B6D4, #3B82F6);
+  background-size: 200% 200%;
+}
+
+.rgb-join-natural {
+  background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+  background-size: 200% 200%;
+}
+
+.rgb-join-self {
+  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+  background-size: 200% 200%;
+}
+
+/* 3. RUN JOIN Button Moving Gradient Perimeter & Fill */
+.rgb-run-button {
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+  background-size: 220% 220%;
+  animation: rgbGradientShift 8s ease infinite;
+  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.32);
+  transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+
+.rgb-run-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 26px rgba(139, 92, 246, 0.48);
+}
+
+.rgb-run-button:active {
+  transform: translateY(0px) scale(0.98);
+  filter: brightness(1.15);
+}
+
+/* 4. Premium Gold Academic Mentorship Card (Slow Metallic Gold Flow & Light Sweep) */
+@keyframes goldMetallicFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes goldMetallicSweep {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+.gold-mentorship-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  /* Multi-tone gold surface: dark antique gold (#8C6500) -> rich gold (#D4AF37) -> champagne (#F4E3A1) -> rich gold (#B8860B) -> dark antique gold */
+  background: linear-gradient(
+    115deg,
+    #8C6500 0%,
+    #B8860B 20%,
+    #D4AF37 40%,
+    #F4E3A1 50%,
+    #D4AF37 60%,
+    #B8860B 80%,
+    #8C6500 100%
+  );
+  background-size: 300% 100%;
+  animation: goldMetallicFlow 22s ease-in-out infinite;
+  border: 1px solid rgba(255, 244, 194, 0.35);
+  box-shadow: 0 10px 30px rgba(140, 101, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: transform 450ms ease, box-shadow 450ms ease, border-color 450ms ease;
+  font-family: "Times New Roman", Times, "Liberation Serif", serif;
+}
+
+/* Subtle, soft, wide metallic light reflection sweep (10s cycle, opacity 0.10-0.15) */
+.gold-mentorship-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 75%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 244, 194, 0.0) 20%,
+    rgba(255, 244, 194, 0.14) 50%,
+    rgba(255, 244, 194, 0.0) 80%,
+    transparent 100%
+  );
+  animation: goldMetallicSweep 10s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gold-mentorship-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 244, 194, 0.65);
+  box-shadow: 0 16px 42px rgba(140, 101, 0, 0.32), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.gold-mentorship-card:hover .gold-cap-icon {
+  filter: drop-shadow(0 0 10px rgba(244, 227, 161, 0.75));
+  transform: scale(1.04);
+}
+
+.gold-mentorship-card:hover .gold-arrow-container {
+  border-color: rgba(255, 244, 194, 0.65);
+  background-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 0 12px rgba(244, 227, 161, 0.4);
+  transform: translateY(-1.5px);
+}
+
+.gold-mentorship-card:hover .gold-arrow-icon {
+  color: #FFFDF5;
+  transform: translate(2px, -2px);
+}
+
+/* 5. Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  .rgb-card-perimeter::before,
+  .rgb-active-join-pill,
+  .rgb-run-button,
+  .gold-mentorship-card::after {
+    animation: none !important;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.6);
+}
