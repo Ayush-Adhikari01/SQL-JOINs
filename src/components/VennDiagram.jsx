@@ -268,15 +268,15 @@ export function VennDiagram({
       {/* SVG Set Diagram Canvas with rich RGB Glow effects */}
       <div className="relative flex flex-col items-center justify-center py-2">
         <svg
-          viewBox="0 0 520 260"
-          className="w-full max-w-lg h-auto overflow-visible filter drop-shadow-md transition-all"
+          viewBox="0 0 600 320"
+          className="w-full max-w-xl h-auto overflow-visible filter drop-shadow-md transition-all select-none"
         >
           <defs>
             <clipPath id="clip-circle-left">
-              <circle cx="210" cy="130" r="95" />
+              <circle cx="215" cy="160" r="135" />
             </clipPath>
             <clipPath id="clip-circle-right">
-              <circle cx="310" cy="130" r="95" />
+              <circle cx="385" cy="160" r="135" />
             </clipPath>
 
             {/* Subtle RGB glow filters */}
@@ -299,9 +299,9 @@ export function VennDiagram({
             onMouseLeave={() => setHoveredPart(null)}
           >
             <circle
-              cx="210"
-              cy="130"
-              r="95"
+              cx="215"
+              cy="160"
+              r="135"
               fill={
                 isLeftHighlighted || selectedRegion === "left"
                   ? "rgba(59, 130, 246, 0.28)"
@@ -323,9 +323,9 @@ export function VennDiagram({
             onMouseLeave={() => setHoveredPart(null)}
           >
             <circle
-              cx="310"
-              cy="130"
-              r="95"
+              cx="385"
+              cy="160"
+              r="135"
               fill={
                 isRightHighlighted || selectedRegion === "right"
                   ? "rgba(139, 92, 246, 0.28)"
@@ -348,9 +348,9 @@ export function VennDiagram({
             onMouseLeave={() => setHoveredPart(null)}
           >
             <circle
-              cx="310"
-              cy="130"
-              r="95"
+              cx="385"
+              cy="160"
+              r="135"
               fill={
                 isIntersectionHighlighted || selectedRegion === "intersection"
                   ? "rgba(6, 182, 212, 0.7)"
@@ -361,112 +361,173 @@ export function VennDiagram({
             />
           </g>
 
-          {/* LABELS & METRIC COUNTS OVERLAY */}
-          {/* Table A Label */}
+          {/* ============================================================== */}
+          {/* LABELS & METRIC COUNTS OVERLAY (PERFECTLY CONTAINED WITHIN REGIONS) */}
+          {/* ============================================================== */}
+
+          {/* LEFT CIRCLE: Table A Label & Metrics (Center of non-overlapping zone ~ x=150) */}
           <text
-            x="145"
-            y="105"
+            x="150"
+            y="126"
             textAnchor="middle"
             fill="currentColor"
-            className="font-bold text-sm select-none pointer-events-none"
-            style={{ color: "var(--text-main)" }}
+            style={{ 
+              color: "var(--text-main)", 
+              fontFamily: '"Times New Roman", Times, serif',
+              fontSize: "19px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
           >
             {tableA.name}
           </text>
           <text
-            x="145"
-            y="125"
+            x="150"
+            y="152"
             textAnchor="middle"
             fill="#3B82F6"
-            className="font-black text-xs font-mono select-none pointer-events-none"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "15px",
+              fontWeight: 800 
+            }}
+            className="select-none pointer-events-none"
           >
             {totalA} ROWS
           </text>
           <text
-            x="145"
-            y="143"
+            x="150"
+            y="176"
             textAnchor="middle"
             fill="#06B6D4"
-            className="font-bold text-[10px] font-mono select-none pointer-events-none"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "14px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
           >
             {matchedA} MATCHED
           </text>
           <text
-            x="145"
-            y="159"
+            x="150"
+            y="198"
             textAnchor="middle"
             fill="#F59E0B"
-            className="font-bold text-[10px] font-mono select-none pointer-events-none"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "14px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
           >
             {unmatchedA} UNMATCHED
           </text>
 
-          {/* Table B Label */}
+          {/* INTERSECTION: Match Labels (Exact center at x=300, y=160) */}
           <text
-            x="375"
-            y="105"
-            textAnchor="middle"
-            fill="currentColor"
-            className="font-bold text-sm select-none pointer-events-none"
-            style={{ color: "var(--text-main)" }}
-          >
-            {tableB.name}
-          </text>
-          <text
-            x="375"
-            y="125"
-            textAnchor="middle"
-            fill="#8B5CF6"
-            className="font-black text-xs font-mono select-none pointer-events-none"
-          >
-            {totalB} ROWS
-          </text>
-          <text
-            x="375"
-            y="143"
-            textAnchor="middle"
-            fill="#06B6D4"
-            className="font-bold text-[10px] font-mono select-none pointer-events-none"
-          >
-            {matchedB} MATCHED
-          </text>
-          <text
-            x="375"
-            y="159"
-            textAnchor="middle"
-            fill="#EC4899"
-            className="font-bold text-[10px] font-mono select-none pointer-events-none"
-          >
-            {unmatchedB} UNMATCHED
-          </text>
-
-          {/* Center Match Label (Intersection) */}
-          <text
-            x="260"
-            y="115"
+            x="300"
+            y="136"
             textAnchor="middle"
             fill="#FFFFFF"
-            className="font-black text-xs uppercase tracking-wider select-none pointer-events-none drop-shadow"
+            style={{ 
+              fontFamily: '"Times New Roman", Times, serif',
+              fontSize: "18px",
+              fontWeight: 800,
+              letterSpacing: "0.08em"
+            }}
+            className="uppercase select-none pointer-events-none drop-shadow"
           >
             MATCH
           </text>
           <text
-            x="260"
-            y="136"
+            x="300"
+            y="164"
             textAnchor="middle"
             fill="#FFFFFF"
-            className="font-black text-xs font-mono select-none pointer-events-none drop-shadow"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "15px",
+              fontWeight: 800,
+              letterSpacing: "0.02em"
+            }}
+            className="select-none pointer-events-none drop-shadow"
           >
             {matchedPairs} MATCHING PAIRS
           </text>
           <text
-            x="260"
-            y="153"
+            x="300"
+            y="188"
             textAnchor="middle"
             fill="#E0F2FE"
-            className="font-bold text-[9px] uppercase tracking-wider select-none pointer-events-none"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "13px",
+              fontWeight: 700,
+              letterSpacing: "0.06em"
+            }}
+            className="uppercase select-none pointer-events-none drop-shadow-sm"
           >
             KEY EQUALITY
+          </text>
+
+          {/* RIGHT CIRCLE: Table B Label & Metrics (Center of non-overlapping zone ~ x=450) */}
+          <text
+            x="450"
+            y="126"
+            textAnchor="middle"
+            fill="currentColor"
+            style={{ 
+              color: "var(--text-main)", 
+              fontFamily: '"Times New Roman", Times, serif',
+              fontSize: "19px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
+          >
+            {tableB.name}
+          </text>
+          <text
+            x="450"
+            y="152"
+            textAnchor="middle"
+            fill="#8B5CF6"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "15px",
+              fontWeight: 800 
+            }}
+            className="select-none pointer-events-none"
+          >
+            {totalB} ROWS
+          </text>
+          <text
+            x="450"
+            y="176"
+            textAnchor="middle"
+            fill="#06B6D4"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "14px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
+          >
+            {matchedB} MATCHED
+          </text>
+          <text
+            x="450"
+            y="198"
+            textAnchor="middle"
+            fill="#EC4899"
+            style={{ 
+              fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
+              fontSize: "14px",
+              fontWeight: 700 
+            }}
+            className="select-none pointer-events-none"
+          >
+            {unmatchedB} UNMATCHED
           </text>
         </svg>
 

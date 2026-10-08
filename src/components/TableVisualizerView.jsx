@@ -229,7 +229,7 @@ export function TableVisualizerView({
                     return (
                       <td
                         key={col.name}
-                        className="p-2 font-mono whitespace-nowrap truncate max-w-[120px]"
+                        className="p-2 font-mono whitespace-nowrap"
                         style={{
                           fontWeight: isKey ? 700 : 500,
                           color: isKey ? "var(--text-main)" : "var(--text-muted)"
