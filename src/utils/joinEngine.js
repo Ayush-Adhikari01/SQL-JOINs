@@ -112,27 +112,28 @@ export function executeJoin({
     };
   }
 
-  // Handle Natural Join key deduction
+  // Handle Natural Join key deduction (match on all shared column names)
   let effectiveKeyA = keyA;
   let effectiveKeyB = keyB;
+  let naturalCommonCols = [];
 
   if (joinType === "NATURAL") {
-    const commonCols = tableA.columns
+    naturalCommonCols = tableA.columns
       .map(c => c.name)
       .filter(colName => tableB.columns.some(bc => bc.name.toLowerCase() === colName.toLowerCase()));
 
-    if (commonCols.length === 0) {
-      warnings.push("No common column names found between tables. NATURAL JOIN degraded to Cartesian CROSS JOIN.");
+    if (naturalCommonCols.length === 0) {
+      warnings.push("No common column names found between relations. NATURAL JOIN operates as Cartesian CROSS JOIN.");
       effectiveKeyA = null;
       effectiveKeyB = null;
     } else {
-      effectiveKeyA = commonCols[0];
+      effectiveKeyA = naturalCommonCols[0];
       const matchedB = tableB.columns.find(bc => bc.name.toLowerCase() === effectiveKeyA.toLowerCase());
       effectiveKeyB = matchedB ? matchedB.name : effectiveKeyA;
     }
   }
 
-  if (joinType !== "CROSS" && !(joinType === "NATURAL" && !effectiveKeyA)) {
+  if (joinType !== "CROSS" && !(joinType === "NATURAL" && naturalCommonCols.length === 0)) {
     if (!effectiveKeyA) {
       errors.push("Please select a join key for Table A.");
     }
@@ -170,8 +171,8 @@ export function executeJoin({
   });
 
   tableB.columns.forEach(col => {
-    // If Natural join matches column, SQL Natural join projects only once
-    const isNaturalDuplicate = joinType === "NATURAL" && effectiveKeyA && col.name.toLowerCase() === effectiveKeyB.toLowerCase();
+    // In SQL Natural join, common attributes are projected ONLY once from Table A
+    const isNaturalDuplicate = joinType === "NATURAL" && naturalCommonCols.some(c => c.toLowerCase() === col.name.toLowerCase());
     if (!isNaturalDuplicate) {
       resultColumns.push({
         key: `b_${col.name}`,
@@ -245,16 +246,27 @@ export function executeJoin({
     });
 
     tableA.rows.forEach((rowA, idxA) => {
-      const valA = rowA[effectiveKeyA];
       let rowAMatched = false;
 
       tableB.rows.forEach((rowB, idxB) => {
         comparisonsCount++;
-        const valB = rowB[effectiveKeyB];
 
-        // SQL Join Equality: NULL never matches NULL
-        const isMatch = (valA !== null && valA !== undefined && valB !== null && valB !== undefined) &&
-          (String(valA).trim().toLowerCase() === String(valB).trim().toLowerCase());
+        let isMatch = false;
+        if (joinType === "NATURAL" && naturalCommonCols.length > 0) {
+          // NATURAL JOIN requires equality across ALL shared columns
+          isMatch = naturalCommonCols.every(colName => {
+            const valA = rowA[colName];
+            const valB = rowB[colName];
+            return (valA !== null && valA !== undefined && valB !== null && valB !== undefined) &&
+              (String(valA).trim().toLowerCase() === String(valB).trim().toLowerCase());
+          });
+        } else {
+          const valA = rowA[effectiveKeyA];
+          const valB = rowB[effectiveKeyB];
+          // SQL Join Equality: NULL never matches NULL
+          isMatch = (valA !== null && valA !== undefined && valB !== null && valB !== undefined) &&
+            (String(valA).trim().toLowerCase() === String(valB).trim().toLowerCase());
+        }
 
         if (isMatch) {
           rowAMatched = true;
@@ -266,7 +278,8 @@ export function executeJoin({
             combined[`a_${col.name}`] = rowA[col.name];
           });
           tableB.columns.forEach(col => {
-            if (!(joinType === "NATURAL" && col.name.toLowerCase() === effectiveKeyB.toLowerCase())) {
+            const isNaturalDuplicate = joinType === "NATURAL" && naturalCommonCols.some(c => c.toLowerCase() === col.name.toLowerCase());
+            if (!isNaturalDuplicate) {
               combined[`b_${col.name}`] = rowB[col.name];
             }
           });
@@ -275,12 +288,12 @@ export function executeJoin({
             originAIndex: idxA,
             originBIndex: idxB,
             matchStatus: "matched",
-            keyValue: valA,
+            keyValue: rowA[effectiveKeyA],
             rowId: `matched_${idxA}_${idxB}`
           };
 
           resultRows.push(combined);
-          matchPairs.push({ indexA: idxA, indexB: idxB, type: "matched", keyVal: valA });
+          matchPairs.push({ indexA: idxA, indexB: idxB, type: "matched", keyVal: rowA[effectiveKeyA] });
         }
       });
 
@@ -291,7 +304,8 @@ export function executeJoin({
           combined[`a_${col.name}`] = rowA[col.name];
         });
         tableB.columns.forEach(col => {
-          if (!(joinType === "NATURAL" && col.name.toLowerCase() === effectiveKeyB.toLowerCase())) {
+          const isNaturalDuplicate = joinType === "NATURAL" && naturalCommonCols.some(c => c.toLowerCase() === col.name.toLowerCase());
+          if (!isNaturalDuplicate) {
             combined[`b_${col.name}`] = null;
           }
         });
@@ -299,7 +313,7 @@ export function executeJoin({
           originAIndex: idxA,
           originBIndex: null,
           matchStatus: "unmatched_left",
-          keyValue: valA,
+          keyValue: rowA[effectiveKeyA],
           rowId: `left_unmatched_${idxA}`
         };
         resultRows.push(combined);
@@ -315,7 +329,8 @@ export function executeJoin({
             combined[`a_${col.name}`] = null;
           });
           tableB.columns.forEach(col => {
-            if (!(joinType === "NATURAL" && col.name.toLowerCase() === effectiveKeyB.toLowerCase())) {
+            const isNaturalDuplicate = joinType === "NATURAL" && naturalCommonCols.some(c => c.toLowerCase() === col.name.toLowerCase());
+            if (!isNaturalDuplicate) {
               combined[`b_${col.name}`] = rowB[col.name];
             }
           });

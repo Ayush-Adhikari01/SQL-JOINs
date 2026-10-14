@@ -25,10 +25,12 @@ export function VisualizerPage({ initialJoinType = "INNER", isDark = false, onSt
   const [keyA, setKeyA] = useState("department_id");
   const [keyB, setKeyB] = useState("department_id");
 
-  // 3. Join result state
+  // 3. Join result state & execution feedback
   const [joinResult, setJoinResult] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [executionBanner, setExecutionBanner] = useState(null); // { type: 'running' | 'success', text: string }
 
   // 4. Interactive linking states
   const [selectedRegion, setSelectedRegion] = useState(null); // 'left' | 'right' | 'intersection' | null
@@ -48,39 +50,84 @@ export function VisualizerPage({ initialJoinType = "INNER", isDark = false, onSt
     setSelectedRegion(null);
     const scenario = SAMPLE_DATASETS[scenarioKey];
     if (scenario) {
-      setTableA(JSON.parse(JSON.stringify(scenario.tableA)));
-      setTableB(JSON.parse(JSON.stringify(scenario.tableB)));
-      setKeyA(scenario.tableA.keyColumn || scenario.tableA.columns[0]?.name || "");
-      setKeyB(scenario.tableB.keyColumn || scenario.tableB.columns[0]?.name || "");
+      const newTableA = JSON.parse(JSON.stringify(scenario.tableA));
+      const newTableB = JSON.parse(JSON.stringify(scenario.tableB));
+      setTableA(newTableA);
+      setTableB(newTableB);
+      setKeyA(newTableA.keyColumn || newTableA.columns[0]?.name || "");
+      setKeyB(newTableB.keyColumn || newTableB.columns[0]?.name || "");
     }
   };
 
   // Run calculation immediately on mount and when parameters change
   useEffect(() => {
-    runJoinComputation();
+    runJoinComputation(false);
   }, [tableA, tableB, joinType, keyA, keyB]);
 
-  const runJoinComputation = () => {
-    const result = executeJoin({
-      tableA,
-      tableB,
-      joinType,
-      keyA,
-      keyB
-    });
-    setJoinResult(result);
-    setCurrentStep(0);
+  const runJoinComputation = (isUserClick = false) => {
+    if (isUserClick) {
+      setIsExecuting(true);
+      setExecutionBanner({
+        type: "running",
+        text: `Executing ${joinType} JOIN algorithm on ${tableA.name} and ${tableB.name}...`
+      });
 
-    // Notify parent app of updated active visualizer state
-    if (typeof onStateChange === "function") {
-      onStateChange({
+      setTimeout(() => {
+        const result = executeJoin({
+          tableA,
+          tableB,
+          joinType,
+          keyA,
+          keyB
+        });
+
+        setJoinResult(result);
+        setCurrentStep(0);
+        setIsExecuting(false);
+        setExecutionBanner({
+          type: "success",
+          text: `✓ ${joinType} JOIN executed successfully: ${result.stats.rowCount} tuples synthesized in ${result.stats.executionTimeMs} ms (${result.stats.matchedCount} matches, ${result.stats.unmatchedLeftCount} unmatched left, ${result.stats.unmatchedRightCount} unmatched right).`
+        });
+
+        // Notify parent app of updated active visualizer state
+        if (typeof onStateChange === "function") {
+          onStateChange({
+            tableA,
+            tableB,
+            joinType,
+            keyA,
+            keyB,
+            joinResult: result
+          });
+        }
+
+        // Clear success banner after 4.5s
+        setTimeout(() => {
+          setExecutionBanner(null);
+        }, 4500);
+      }, 250);
+    } else {
+      const result = executeJoin({
         tableA,
         tableB,
         joinType,
         keyA,
-        keyB,
-        joinResult: result
+        keyB
       });
+      setJoinResult(result);
+      setCurrentStep(0);
+
+      // Notify parent app of updated active visualizer state
+      if (typeof onStateChange === "function") {
+        onStateChange({
+          tableA,
+          tableB,
+          joinType,
+          keyA,
+          keyB,
+          joinResult: result
+        });
+      }
     }
   };
 
@@ -299,14 +346,44 @@ export function VisualizerPage({ initialJoinType = "INNER", isDark = false, onSt
           {/* Step 4: Visually Dominant RUN JOIN Button with Animated RGB Perimeter Gradient */}
           <div className="lg:col-span-2">
             <button
-              onClick={runJoinComputation}
-              className="rgb-run-button w-full py-3 px-4 rounded-2xl text-white font-bold text-sm sm:text-base flex items-center justify-center space-x-2 cursor-pointer"
+              onClick={() => runJoinComputation(true)}
+              disabled={isExecuting}
+              className={`rgb-run-button w-full py-3 px-4 rounded-2xl text-white font-bold text-sm sm:text-base flex items-center justify-center space-x-2 cursor-pointer transition-all ${
+                isExecuting ? "opacity-75 scale-95" : ""
+              }`}
             >
-              <Play className="w-4 h-4 fill-current" />
-              <span>RUN JOIN</span>
+              {isExecuting ? (
+                <>
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>EXECUTING...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-4 h-4 fill-current" />
+                  <span>RUN JOIN</span>
+                </>
+              )}
             </button>
           </div>
         </div>
+
+        {/* Dynamic Execution Feedback Banner */}
+        {executionBanner && (
+          <div 
+            className={`p-3.5 rounded-2xl border flex items-center space-x-2.5 text-xs sm:text-sm font-semibold transition-all animate-fade-in ${
+              executionBanner.type === "running"
+                ? "bg-blue-500/10 border-blue-500/40 text-blue-400"
+                : "bg-emerald-500/10 border-emerald-500/40 text-emerald-400"
+            }`}
+          >
+            {executionBanner.type === "running" ? (
+              <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            )}
+            <span>{executionBanner.text}</span>
+          </div>
+        )}
       </div>
 
       {/* ============================================================== */}

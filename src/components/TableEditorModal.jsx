@@ -8,23 +8,35 @@ export function TableEditorModal({
   onSave,
   tableNameLabel = "Table A"
 }) {
-  if (!isOpen) return null;
-
-  const [tableName, setTableName] = useState(initialTable.name || "CustomTable");
-  const [alias, setAlias] = useState(initialTable.alias || "t");
+  const [tableName, setTableName] = useState(initialTable?.name || "CustomTable");
+  const [alias, setAlias] = useState(initialTable?.alias || "t");
   const [columns, setColumns] = useState(
-    initialTable.columns ? JSON.parse(JSON.stringify(initialTable.columns)) : [
+    initialTable?.columns ? JSON.parse(JSON.stringify(initialTable.columns)) : [
       { name: "id", label: "ID", type: "number", isPrimary: true },
       { name: "name", label: "Name", type: "string" }
     ]
   );
   const [rows, setRows] = useState(
-    initialTable.rows ? JSON.parse(JSON.stringify(initialTable.rows)) : []
+    initialTable?.rows ? JSON.parse(JSON.stringify(initialTable.rows)) : []
   );
 
   const [newColName, setNewColName] = useState("");
   const [newColType, setNewColType] = useState("string");
   const [errorMsg, setErrorMsg] = useState("");
+
+  // Re-synchronize state whenever modal is opened with new initialTable
+  React.useEffect(() => {
+    if (isOpen && initialTable) {
+      setTableName(initialTable.name || "CustomTable");
+      setAlias(initialTable.alias || "t");
+      setColumns(initialTable.columns ? JSON.parse(JSON.stringify(initialTable.columns)) : []);
+      setRows(initialTable.rows ? JSON.parse(JSON.stringify(initialTable.rows)) : []);
+      setErrorMsg("");
+      setNewColName("");
+    }
+  }, [isOpen, initialTable]);
+
+  if (!isOpen) return null;
 
   const handleAddColumn = () => {
     const cleanName = newColName.trim().replace(/\s+/g, "_").toLowerCase();
