@@ -45,6 +45,14 @@ export default function App() {
     return THEME_PRESETS[0].accent;
   });
 
+  const [customAccent2, setCustomAccent2] = useState(() => {
+    const saved = localStorage.getItem("theme_accent2");
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return THEME_PRESETS[0].accent2 || THEME_PRESETS[0].accent;
+  });
+
   // Modal controller for Theme & RGB customizer
   const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
 
@@ -53,18 +61,28 @@ export default function App() {
     applyThemeVariables({
       primary: customPrimary,
       accent: customAccent,
+      accent2: customAccent2,
       isDark
     });
     localStorage.setItem("theme_mode", isDark ? "dark" : "light");
     localStorage.setItem("theme_primary", JSON.stringify(customPrimary));
     localStorage.setItem("theme_accent", JSON.stringify(customAccent));
+    localStorage.setItem("theme_accent2", JSON.stringify(customAccent2));
     localStorage.setItem("theme_preset_id", currentPresetId);
-  }, [customPrimary, customAccent, isDark, currentPresetId]);
+  }, [customPrimary, customAccent, customAccent2, isDark, currentPresetId]);
+
+  // Reset document scroll position to top when switching main navigation tabs
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [activeTab]);
 
   const handleSelectPreset = (preset) => {
     setCurrentPresetId(preset.id);
     setCustomPrimary(preset.primary);
     setCustomAccent(preset.accent);
+    if (preset.accent2) {
+      setCustomAccent2(preset.accent2);
+    }
   };
 
   // Live Visualizer State tracking for Global Navbar Export

@@ -44,7 +44,7 @@ export function RowLevelVisualizer({
               Row-Level Relational Matching Visualizer
             </h3>
             <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-              Live tuple-by-tuple linkage based on equality: <strong className="font-mono text-cyan-500">{tableA.name}.{keyA || 'key'} = {tableB.name}.{keyB || 'key'}</strong>
+              Live tuple-by-tuple linkage based on equality: <strong className="font-mono" style={{ color: "var(--color-primary)" }}>{tableA.name}.{keyA || 'key'} = {tableB.name}.{keyB || 'key'}</strong>
             </p>
           </div>
         </div>
@@ -52,7 +52,7 @@ export function RowLevelVisualizer({
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold">
           <span className="flex items-center space-x-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block" />
+            <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: "var(--semantic-match)" }} />
             <span style={{ color: "var(--text-main)" }}>Matched Tuple Pair</span>
           </span>
           <span className="flex items-center space-x-1">
@@ -108,11 +108,23 @@ export function RowLevelVisualizer({
                     </div>
 
                     <div className="flex items-center space-x-2 shrink-0">
-                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-500 font-bold">
+                      <span 
+                        className="font-mono text-[11px] px-1.5 py-0.5 rounded font-bold"
+                        style={{
+                          backgroundColor: "var(--color-primary-subtle)",
+                          color: "var(--color-primary)"
+                        }}
+                      >
                         {valKeyA === null ? "NULL" : valKeyA}
                       </span>
                       {isMatched ? (
-                        <span className="p-0.5 rounded-full bg-cyan-500/20 text-cyan-500">
+                        <span 
+                          className="p-0.5 rounded-full"
+                          style={{
+                            backgroundColor: "var(--semantic-match-subtle)",
+                            color: "var(--semantic-match)"
+                          }}
+                        >
                           <Check className="w-3.5 h-3.5" />
                         </span>
                       ) : (
@@ -133,7 +145,7 @@ export function RowLevelVisualizer({
               <span className="text-[10px] uppercase font-bold tracking-widest block text-slate-400">
                 Predicate
               </span>
-              <div className="font-mono text-xs font-bold text-cyan-500">
+              <div className="font-mono text-xs font-bold" style={{ color: "var(--color-primary)" }}>
                 {joinType === "CROSS" ? "× (All)" : "="}
               </div>
               <span className="text-[9px] block text-slate-400">
@@ -171,7 +183,13 @@ export function RowLevelVisualizer({
                   >
                     <div className="flex items-center space-x-2 shrink-0">
                       {isMatched ? (
-                        <span className="p-0.5 rounded-full bg-cyan-500/20 text-cyan-500">
+                        <span 
+                          className="p-0.5 rounded-full"
+                          style={{
+                            backgroundColor: "var(--semantic-match-subtle)",
+                            color: "var(--semantic-match)"
+                          }}
+                        >
                           <Check className="w-3.5 h-3.5" />
                         </span>
                       ) : (
@@ -179,7 +197,13 @@ export function RowLevelVisualizer({
                           <X className="w-3.5 h-3.5" />
                         </span>
                       )}
-                      <span className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-500 font-bold">
+                      <span 
+                        className="font-mono text-[11px] px-1.5 py-0.5 rounded font-bold"
+                        style={{
+                          backgroundColor: "var(--color-accent-subtle)",
+                          color: "var(--color-accent)"
+                        }}
+                      >
                         {valKeyB === null ? "NULL" : valKeyB}
                       </span>
                     </div>

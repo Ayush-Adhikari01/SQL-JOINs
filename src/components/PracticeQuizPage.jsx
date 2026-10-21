@@ -45,6 +45,22 @@ export function PracticeQuizPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const isExamActiveRef = useRef(false);
+  const questionCardRef = useRef(null);
+
+  // Reset scroll to top whenever entering a new view
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [currentView]);
+
+  // Keep question card predictably in view when navigating questions without full-page jumps
+  useEffect(() => {
+    if (questionCardRef.current && (currentView === "gate_exam" || currentView === "practice_quiz")) {
+      const rect = questionCardRef.current.getBoundingClientRect();
+      if (rect.top < 76 || rect.top > window.innerHeight - 120) {
+        questionCardRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [currentIndex, currentView]);
 
   // -------------------------------------------------------------------------
   // Dynamic Calculation of Bank Statistics
@@ -767,9 +783,7 @@ export function PracticeQuizPage() {
             disabled={eligibleQuestionCount === 0}
             className="w-full py-4 rounded-2xl text-white font-bold text-base shadow-lg transition-transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             style={{
-              background: activeMode === "gate"
-                ? "linear-gradient(135deg, #06B6D4, #3B82F6)"
-                : "linear-gradient(135deg, #8B5CF6, #EC4899)"
+              background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))"
             }}
           >
             {activeMode === "gate" ? <Maximize2 className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
@@ -796,20 +810,23 @@ export function PracticeQuizPage() {
     }).length;
     
     const currentQType = (currentQ?.questionType || currentQ?.type || "MCQ").toUpperCase();
-    const isAnswerRevealed = revealedSolutions[currentQ.id];
+    const isAnswerRevealed = Boolean(revealedSolutions[currentQ.id]);
     const currentUserAns = userAnswers[currentQ.id];
 
+    // Determine if the user has selected/entered an answer for this question
+    const hasSelectedAnswer = (() => {
+      if (currentUserAns === undefined || currentUserAns === null) return false;
+      if (currentQType === "MSQ") {
+        return Array.isArray(currentUserAns) && currentUserAns.length > 0;
+      }
+      return String(currentUserAns).trim() !== "";
+    })();
+
     return (
-      <div 
-        className="fixed inset-0 z-50 overflow-y-auto p-4 sm:p-8 flex flex-col justify-between font-serif"
-        style={{
-          backgroundColor: "var(--bg-app)",
-          color: "var(--text-main)"
-        }}
-      >
-        {/* Top Professional Exam Bar */}
+      <div className="max-w-4xl w-full mx-auto space-y-6 pb-20 animate-fade-in font-serif">
+        {/* Top Professional Exam Bar - Sticky below main Navbar */}
         <div 
-          className="max-w-4xl w-full mx-auto p-4 rounded-2xl border shadow-sm flex flex-wrap items-center justify-between gap-3 mb-6"
+          className="sticky top-[72px] z-30 p-4 rounded-2xl border shadow-sm flex flex-wrap items-center justify-between gap-3 backdrop-blur-md transition-colors"
           style={{
             backgroundColor: "var(--bg-surface)",
             borderColor: "var(--border-subtle)"
@@ -817,11 +834,9 @@ export function PracticeQuizPage() {
         >
           <div className="flex items-center space-x-3">
             <span 
-              className="px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider font-mono"
+              className="px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wider font-mono shadow-xs"
               style={{
-                background: activeMode === "gate"
-                  ? "linear-gradient(135deg, #06B6D4, #3B82F6)"
-                  : "linear-gradient(135deg, #8B5CF6, #EC4899)"
+                background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))"
               }}
             >
               {activeMode === "gate" ? "GATE CSE EXAM" : "PRACTICE DRILL"}
@@ -833,14 +848,14 @@ export function PracticeQuizPage() {
 
           <div className="flex items-center space-x-4 text-xs font-mono">
             <span className="flex items-center space-x-1" style={{ color: "var(--text-muted)" }}>
-              <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              <Clock className="w-3.5 h-3.5" style={{ color: "var(--color-primary)" }} />
               <span>{formatTime(elapsedSeconds)}</span>
             </span>
             <span style={{ color: "var(--text-muted)" }}>
-              Answered: <strong className="text-cyan-400">{answeredCount}</strong> / {totalQ}
+              Answered: <strong style={{ color: "var(--color-primary)" }}>{answeredCount}</strong> / {totalQ}
             </span>
             <span style={{ color: "var(--text-muted)" }}>
-              Question: <strong className="text-violet-400">{currentIndex + 1}</strong> of {totalQ}
+              Question: <strong style={{ color: "var(--color-accent)" }}>{currentIndex + 1}</strong> of {totalQ}
             </span>
             <button
               onClick={() => submitTest("normal")}
@@ -853,7 +868,8 @@ export function PracticeQuizPage() {
 
         {/* Question Card */}
         <div 
-          className="max-w-4xl w-full mx-auto p-6 sm:p-10 rounded-3xl border shadow-md space-y-6 flex-1 flex flex-col justify-between"
+          ref={questionCardRef}
+          className="w-full p-6 sm:p-10 rounded-3xl border shadow-md space-y-6 flex flex-col justify-between"
           style={{
             backgroundColor: "var(--bg-surface)",
             borderColor: "var(--border-subtle)"
@@ -863,25 +879,40 @@ export function PracticeQuizPage() {
           <div className="space-y-3 pb-4 border-b" style={{ borderColor: "var(--border-subtle)" }}>
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
               <div className="flex items-center space-x-2">
-                {activeMode === "gate" ? (
-                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-400 border border-cyan-500/40">
-                    ★ VERIFIED GATE PYQ • {currentQ.year} {currentQ.set ? `(${currentQ.set})` : ""}
-                  </span>
-                ) : (
-                  <span className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider bg-violet-500/15 text-violet-400 border border-violet-500/40">
-                    ✦ INTERACTIVE PRACTICE
-                  </span>
-                )}
+                <span 
+                  className="px-2.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider border"
+                  style={{
+                    backgroundColor: "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.15)",
+                    borderColor: "var(--color-primary)",
+                    color: "var(--color-primary)"
+                  }}
+                >
+                  {activeMode === "gate" 
+                    ? `★ VERIFIED GATE PYQ • ${currentQ.year} ${currentQ.set ? `(${currentQ.set})` : ""}`
+                    : "✦ INTERACTIVE PRACTICE"}
+                </span>
                 <span className="text-slate-400 font-bold hidden sm:inline">• {currentQ.topic}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold">
                   {currentQType}
                 </span>
-                <span className="px-2 py-0.5 rounded bg-blue-500/15 text-blue-400 font-bold">
+                <span 
+                  className="px-2 py-0.5 rounded font-bold"
+                  style={{
+                    backgroundColor: "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.12)",
+                    color: "var(--color-primary)"
+                  }}
+                >
                   {currentQ.marks || (activeMode === "gate" ? 2 : 1)} Mark{(currentQ.marks || 1) > 1 ? "s" : ""}
                 </span>
-                <span className="px-2 py-0.5 rounded bg-violet-500/15 text-violet-400 font-bold">
+                <span 
+                  className="px-2 py-0.5 rounded font-bold"
+                  style={{
+                    backgroundColor: "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12)",
+                    color: "var(--color-accent)"
+                  }}
+                >
                   {currentQ.difficulty}
                 </span>
               </div>
@@ -893,7 +924,7 @@ export function PracticeQuizPage() {
             </h2>
 
             {currentQType === "MSQ" && (
-              <div className="text-xs text-fuchsia-400 font-mono font-semibold">
+              <div className="text-xs font-mono font-semibold" style={{ color: "var(--color-accent)" }}>
                 ℹ️ Multiple Select Question: One or more options may be correct.
               </div>
             )}
@@ -913,11 +944,17 @@ export function PracticeQuizPage() {
                     value={currentUserAns || ""}
                     onChange={(e) => handleNatInputChange(currentQ.id, e.target.value)}
                     placeholder="e.g. 24"
-                    className="p-3 rounded-xl border font-mono text-base font-bold w-48 outline-hidden"
+                    className={`p-3 rounded-xl border font-mono text-base font-bold w-48 outline-hidden transition-colors ${
+                      isAnswerRevealed
+                        ? checkQuestionCorrectness(currentQ, currentUserAns)
+                          ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
+                          : "border-rose-500 bg-rose-500/10 text-rose-300"
+                        : ""
+                    }`}
                     style={{
-                      backgroundColor: "var(--bg-surface)",
-                      borderColor: "var(--border-subtle)",
-                      color: "var(--text-main)"
+                      backgroundColor: isAnswerRevealed ? undefined : "var(--bg-surface)",
+                      borderColor: isAnswerRevealed ? undefined : "var(--border-subtle)",
+                      color: isAnswerRevealed ? undefined : "var(--text-main)"
                     }}
                   />
                   <span className="text-xs font-mono text-slate-400">Numerical Value</span>
@@ -931,19 +968,31 @@ export function PracticeQuizPage() {
                   : currentUserAns === opt.id;
 
                 const isCorrectOption = opt.isCorrect;
-                const showInstantHighlight = isAnswerRevealed && activeMode === "practice";
+                const showInstantHighlight = Boolean(isAnswerRevealed);
 
                 let borderHighlight = "hover:border-slate-500";
+                let dynamicStyle = {
+                  backgroundColor: "var(--bg-elevated)",
+                  borderColor: "var(--border-subtle)",
+                  color: "var(--text-main)"
+                };
+
                 if (showInstantHighlight) {
                   if (isCorrectOption) {
-                    borderHighlight = "bg-emerald-500/15 border-emerald-500 text-emerald-400";
+                    borderHighlight = "bg-emerald-500/15 border-emerald-500 text-emerald-400 font-semibold";
+                    dynamicStyle = {};
                   } else if (isSelected && !isCorrectOption) {
-                    borderHighlight = "bg-rose-500/15 border-rose-500 text-rose-400";
+                    borderHighlight = "bg-rose-500/15 border-rose-500 text-rose-400 font-semibold";
+                    dynamicStyle = {};
                   }
                 } else if (isSelected) {
-                  borderHighlight = activeMode === "gate"
-                    ? "bg-cyan-500/15 border-cyan-500 ring-2 ring-cyan-500/30 text-white"
-                    : "bg-violet-500/15 border-violet-500 ring-2 ring-violet-500/30 text-white";
+                  borderHighlight = "ring-2 font-bold";
+                  dynamicStyle = {
+                    backgroundColor: "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.15)",
+                    borderColor: "var(--color-primary)",
+                    color: "var(--text-main)",
+                    boxShadow: "0 0 12px var(--color-primary-glow)"
+                  };
                 }
 
                 return (
@@ -951,18 +1000,21 @@ export function PracticeQuizPage() {
                     key={opt.id}
                     onClick={() => handleSelectOption(currentQ.id, opt.id, currentQType)}
                     className={`w-full p-4 rounded-2xl border text-left text-sm sm:text-base transition-all flex items-start space-x-3 cursor-pointer ${borderHighlight}`}
-                    style={{
-                      backgroundColor: isSelected || showInstantHighlight ? undefined : "var(--bg-elevated)",
-                      borderColor: isSelected || showInstantHighlight ? undefined : "var(--border-subtle)",
-                      color: isSelected ? "#FFFFFF" : "var(--text-main)"
-                    }}
+                    style={dynamicStyle}
                   >
                     <span 
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 font-mono text-xs font-bold ${
-                        isSelected 
-                          ? activeMode === "gate" ? "bg-cyan-500 text-black" : "bg-violet-500 text-white"
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 font-mono text-xs font-bold transition-colors ${
+                        showInstantHighlight && isCorrectOption
+                          ? "bg-emerald-500 text-black font-black"
+                          : showInstantHighlight && isSelected && !isCorrectOption
+                          ? "bg-rose-500 text-white font-black"
+                          : isSelected 
+                          ? "text-white"
                           : "bg-slate-700/50 text-slate-300"
                       }`}
+                      style={{
+                        backgroundColor: isSelected && !showInstantHighlight ? "var(--color-primary)" : undefined
+                      }}
                     >
                       {currentQType === "MSQ" ? (isSelected ? "☑" : "☐") : opt.id}
                     </span>
@@ -972,44 +1024,68 @@ export function PracticeQuizPage() {
               })
             )}
 
-            {/* Instant Learning Feedback Button (Practice Mode only) */}
-            {activeMode === "practice" && instantFeedbackMode && (
-              <div className="pt-2">
+            {/* Instant Answer Checking & Solution Section (Available in both Gate Mode and Practice Mode) */}
+            <div className="pt-2">
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => toggleRevealSolution(currentQ.id)}
-                  className="px-4 py-2 rounded-xl border text-xs font-mono font-bold flex items-center space-x-2 transition-colors cursor-pointer text-violet-400 border-violet-500/40 bg-violet-500/10 hover:bg-violet-500/20"
+                  onClick={() => {
+                    if (!hasSelectedAnswer && !isAnswerRevealed) return;
+                    toggleRevealSolution(currentQ.id);
+                  }}
+                  disabled={!hasSelectedAnswer && !isAnswerRevealed}
+                  title={!hasSelectedAnswer && !isAnswerRevealed ? "Please select an answer first to check" : (isAnswerRevealed ? "Hide Solution" : "Check Answer")}
+                  className="px-4 py-2 rounded-xl border text-xs font-mono font-bold flex items-center space-x-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    color: "var(--color-accent)",
+                    borderColor: "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)",
+                    backgroundColor: "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.12)"
+                  }}
                 >
                   <Zap className="w-3.5 h-3.5" />
                   <span>{isAnswerRevealed ? "Hide Solution" : "Check Answer & Solution"}</span>
                 </button>
 
-                {isAnswerRevealed && (
-                  <div 
-                    className="mt-3 p-4 rounded-2xl border text-xs sm:text-sm space-y-2 animate-fade-in"
-                    style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border-subtle)" }}
-                  >
-                    <div className="flex items-center space-x-2 font-mono font-bold">
+                {!hasSelectedAnswer && !isAnswerRevealed && (
+                  <span className="text-xs font-mono text-slate-400 italic">
+                    Select an answer above to enable checking
+                  </span>
+                )}
+              </div>
+
+              {isAnswerRevealed && (
+                <div 
+                  className="mt-3 p-4 sm:p-5 rounded-2xl border text-xs sm:text-sm space-y-2.5 animate-fade-in"
+                  style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border-subtle)" }}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 font-mono font-bold">
+                    <div className="flex items-center space-x-2">
                       {checkQuestionCorrectness(currentQ, currentUserAns) ? (
-                        <span className="text-emerald-400 flex items-center space-x-1">
-                          <CheckCircle2 className="w-4 h-4" />
+                        <span className="text-emerald-400 flex items-center space-x-1.5">
+                          <CheckCircle2 className="w-4 h-4 shrink-0" />
                           <span>Correct!</span>
                         </span>
                       ) : (
-                        <span className="text-rose-400 flex items-center space-x-1">
-                          <XCircle className="w-4 h-4" />
+                        <span className="text-rose-400 flex items-center space-x-1.5">
+                          <XCircle className="w-4 h-4 shrink-0" />
                           <span>Incorrect / Needs Review</span>
                         </span>
                       )}
-                      <span className="text-slate-400">• Correct Answer: {Array.isArray(currentQ.answer) ? currentQ.answer.join(", ") : currentQ.answer}</span>
                     </div>
-                    <p style={{ color: "var(--text-main)" }} className="whitespace-pre-line font-serif">
-                      {currentQ.explanation}
-                    </p>
+                    <span className="text-slate-400 font-mono text-xs">
+                      Correct Answer: <strong className="text-emerald-400">{Array.isArray(currentQ.answer) ? currentQ.answer.join(", ") : currentQ.answer}</strong>
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
+                  {currentQ.explanation && (
+                    <div className="pt-2 border-t border-slate-700/40">
+                      <p style={{ color: "var(--text-main)" }} className="whitespace-pre-line font-serif leading-relaxed">
+                        {currentQ.explanation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Stepper Navigation Buttons */}
@@ -1038,11 +1114,14 @@ export function PracticeQuizPage() {
                     onClick={() => setCurrentIndex(i)}
                     className={`w-3.5 h-3.5 rounded-full transition-all shrink-0 cursor-pointer ${
                       i === currentIndex
-                        ? "bg-cyan-400 scale-125"
+                        ? "scale-125 ring-2 ring-white/40"
                         : hasAnswered
                         ? "bg-emerald-500"
                         : "bg-slate-700"
                     }`}
+                    style={{
+                      backgroundColor: i === currentIndex ? "var(--color-primary)" : undefined
+                    }}
                     title={`Jump to Question ${i + 1}`}
                   />
                 );
@@ -1053,7 +1132,7 @@ export function PracticeQuizPage() {
               <button
                 onClick={() => setCurrentIndex((prev) => Math.min(totalQ - 1, prev + 1))}
                 className="flex items-center space-x-1.5 px-5 py-2 rounded-xl text-white font-bold text-xs sm:text-sm shadow-xs transition-transform hover:scale-105 cursor-pointer"
-                style={{ background: "linear-gradient(135deg, #06B6D4, #3B82F6)" }}
+                style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
               >
                 <span>Next</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1167,7 +1246,7 @@ export function PracticeQuizPage() {
             <button
               onClick={handleStartTest}
               className="flex items-center space-x-2 px-6 py-3 rounded-2xl text-white font-bold text-xs sm:text-sm shadow-md transition-transform hover:scale-105 cursor-pointer font-mono"
-              style={{ background: "linear-gradient(135deg, #06B6D4, #3B82F6)" }}
+              style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
             >
               <RotateCcw className="w-4 h-4" />
               <span>Practice Again (New Random Set)</span>

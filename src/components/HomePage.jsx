@@ -237,7 +237,7 @@ export function HomePage({ setActiveTab, onSelectJoinType }) {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold" style={{ color: "var(--text-main)" }}>
-            7 Supported Relational Operations
+            {JOIN_TYPES.length} Supported Relational Operations
           </h3>
           <span className="text-xs font-semibold" style={{ color: "var(--color-primary)" }}>
             Click any operation to simulate

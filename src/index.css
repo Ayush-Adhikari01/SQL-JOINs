@@ -134,7 +134,7 @@
   }
 }
 
-/* 1. Core Animated RGB Border Wrapper for Cards */
+/* 1. Core Animated RGB Border Wrapper for Cards - Uses active theme palette */
 .rgb-card-perimeter {
   position: relative;
   border-radius: 1.5rem; /* 24px */
@@ -142,15 +142,15 @@
   overflow: hidden;
   background: conic-gradient(
     from 0deg,
-    #3B82F6,  /* Electric Blue */
-    #06B6D4,  /* Cyan */
-    #8B5CF6,  /* Violet */
-    #EC4899,  /* Magenta */
-    #F59E0B,  /* Gold */
-    #3B82F6   /* Back to Electric Blue */
+    var(--color-primary),
+    var(--color-accent),
+    var(--color-accent2, var(--color-primary)),
+    var(--color-primary),
+    var(--color-accent),
+    var(--color-primary)
   );
   transition: transform 250ms ease, box-shadow 250ms ease;
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 0 16px var(--color-primary-glow);
 }
 
 .rgb-card-perimeter::before {
@@ -162,12 +162,12 @@
   height: 200%;
   background: conic-gradient(
     from 0deg,
-    #3B82F6 0deg,
-    #06B6D4 72deg,
-    #8B5CF6 144deg,
-    #EC4899 216deg,
-    #F59E0B 288deg,
-    #3B82F6 360deg
+    var(--color-primary) 0deg,
+    var(--color-accent) 72deg,
+    var(--color-accent2, var(--color-primary)) 144deg,
+    var(--color-accent) 216deg,
+    var(--color-primary) 288deg,
+    var(--color-primary) 360deg
   );
   animation: rgbPerimeterSpin 10s linear infinite;
   z-index: 0;
@@ -176,11 +176,11 @@
 
 .rgb-card-perimeter:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 28px rgba(6, 182, 212, 0.28);
+  box-shadow: 0 0 28px var(--color-accent-glow);
 }
 
 .rgb-card-perimeter:active {
-  box-shadow: 0 0 34px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 34px var(--color-primary-glow);
 }
 
 /* Inner surface ensures interior stays strictly dark / theme-appropriate */
@@ -195,12 +195,12 @@
 
 /* Light mode version of the RGB perimeter */
 :root.light .rgb-card-perimeter {
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.08);
+  box-shadow: 0 0 12px var(--color-primary-glow);
   opacity: 0.95;
 }
 
 :root.light .rgb-card-perimeter:hover {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.18);
+  box-shadow: 0 0 20px var(--color-accent-glow);
 }
 
 /* 2. Interactive Animated Perimeter for Active JOIN Pill */
@@ -209,64 +209,64 @@
   z-index: 1;
   background-size: 250% 250%;
   animation: rgbGradientShift 7s ease infinite;
-  box-shadow: 0 0 14px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 14px var(--color-primary-glow);
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
 .rgb-active-join-pill:hover {
   transform: translateY(-1.5px);
-  box-shadow: 0 0 22px rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 22px var(--color-accent-glow);
 }
 
 /* Specific operation gradient borders */
 .rgb-join-inner {
-  background: linear-gradient(135deg, #3B82F6, #06B6D4, #8B5CF6);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   background-size: 200% 200%;
 }
 
 .rgb-join-left {
-  background: linear-gradient(135deg, #3B82F6, #06B6D4);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent2, var(--color-primary)));
   background-size: 200% 200%;
 }
 
 .rgb-join-right {
-  background: linear-gradient(135deg, #8B5CF6, #EC4899);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
   background-size: 200% 200%;
 }
 
 .rgb-join-full {
-  background: linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   background-size: 200% 200%;
 }
 
 .rgb-join-cross {
-  background: linear-gradient(135deg, #06B6D4, #3B82F6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
   background-size: 200% 200%;
 }
 
 .rgb-join-natural {
-  background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   background-size: 200% 200%;
 }
 
 .rgb-join-self {
-  background: linear-gradient(135deg, #EC4899, #8B5CF6);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-primary));
   background-size: 200% 200%;
 }
 
 /* 3. RUN JOIN Button Moving Gradient Perimeter & Fill */
 .rgb-run-button {
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
   background-size: 220% 220%;
   animation: rgbGradientShift 8s ease infinite;
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.32);
+  box-shadow: 0 4px 18px var(--color-primary-glow);
   transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
 }
 
 .rgb-run-button:hover {
   transform: translateY(-2px) scale(1.02);
   filter: brightness(1.1);
-  box-shadow: 0 6px 26px rgba(139, 92, 246, 0.48);
+  box-shadow: 0 6px 26px var(--color-accent-glow);
 }
 
 .rgb-run-button:active {
@@ -391,3 +391,39 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(161, 161, 170, 0.6);
 }
+
+/* Flying Data Animation & Landing Pulse dynamically themed */
+@keyframes cellLandedGlow {
+  0% {
+    background-color: var(--semantic-match-subtle, rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3));
+    box-shadow: 0 0 16px var(--semantic-match-glow, rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.7));
+    transform: scale(1.06);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+    transform: scale(1);
+  }
+}
+
+.cell-landed-glow {
+  animation: cellLandedGlow 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.flying-data-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  will-change: transform, opacity;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px var(--color-accent-glow);
+}
+

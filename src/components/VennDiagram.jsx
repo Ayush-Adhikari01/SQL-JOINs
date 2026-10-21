@@ -169,19 +169,33 @@ export function VennDiagram({
 
         {/* Tree Branch Diagram */}
         <div className="p-6 rounded-2xl border flex flex-col items-center justify-center space-y-4" style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border-subtle)" }}>
-          <div className="px-4 py-2 rounded-xl border font-bold text-xs shadow-sm" style={{ backgroundColor: "var(--bg-surface)", borderColor: "#3B82F6", color: "#60A5FA" }}>
+          <div className="px-4 py-2 rounded-xl border font-bold text-xs shadow-sm" style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--color-primary)", color: "var(--color-primary)" }}>
             Root Table: {tableA.name}
           </div>
 
           <div className="flex items-center space-x-12 relative">
             <div className="text-center space-y-1">
               <span className="text-[10px] uppercase font-bold text-slate-400 block">Role 1: Employee Alias</span>
-              <div className="px-3 py-1.5 rounded-xl border text-xs font-mono font-bold bg-blue-500/10 border-blue-500/40 text-blue-400">
+              <div 
+                className="px-3 py-1.5 rounded-xl border text-xs font-mono font-bold"
+                style={{
+                  backgroundColor: "var(--color-primary-subtle)",
+                  borderColor: "var(--color-primary)",
+                  color: "var(--color-primary)"
+                }}
+              >
                 {tableA.alias || "emp"} (Parent)
               </div>
             </div>
 
-            <div className="font-mono text-xs font-bold text-cyan-400 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/30">
+            <div 
+              className="font-mono text-xs font-bold px-2 py-1 rounded border"
+              style={{
+                backgroundColor: "var(--color-accent-subtle)",
+                borderColor: "var(--color-accent)",
+                color: "var(--color-accent)"
+              }}
+            >
               {tableA.alias || "emp"}.{keyA} = {tableB.alias || "mgr"}.{keyB}
             </div>
 
@@ -234,7 +248,7 @@ export function VennDiagram({
         <div className="flex items-center space-x-2.5">
           <div 
             className="p-1.5 rounded-xl text-white shadow-xs"
-            style={{ background: "linear-gradient(135deg, #3B82F6, #8B5CF6, #06B6D4)" }}
+            style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
           >
             <Sparkles className="w-4 h-4" />
           </div>
@@ -253,7 +267,12 @@ export function VennDiagram({
           {selectedRegion ? (
             <button
               onClick={() => onSelectRegion(null)}
-              className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/15 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-500/25 transition-colors cursor-pointer"
+              className="text-[11px] font-bold px-2.5 py-1 rounded-full border transition-colors cursor-pointer"
+              style={{
+                backgroundColor: "var(--color-primary-subtle)",
+                color: "var(--color-primary)",
+                borderColor: "var(--color-primary)"
+              }}
             >
               Filter: {selectedRegion.toUpperCase()} ✕
             </button>
@@ -281,17 +300,17 @@ export function VennDiagram({
 
             {/* Subtle RGB glow filters */}
             <filter id="glow-cyan-intersection" x="-30%" y="-30%" width="160%" height="160%">
-              <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#06B6D4" floodOpacity="0.6" />
+              <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="var(--color-accent)" floodOpacity="0.6" />
             </filter>
             <filter id="glow-blue-left" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#3B82F6" floodOpacity="0.4" />
+              <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="var(--color-primary)" floodOpacity="0.4" />
             </filter>
             <filter id="glow-violet-right" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#8B5CF6" floodOpacity="0.4" />
+              <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="var(--color-accent)" floodOpacity="0.4" />
             </filter>
           </defs>
 
-          {/* CIRCLE A (Left Relation - Electric Blue / Indigo) */}
+          {/* CIRCLE A (Left Relation) */}
           <g 
             className="cursor-pointer group transition-transform duration-200"
             onClick={() => onSelectRegion("left")}
@@ -304,10 +323,10 @@ export function VennDiagram({
               r="135"
               fill={
                 isLeftHighlighted || selectedRegion === "left"
-                  ? "rgba(59, 130, 246, 0.28)"
+                  ? "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.28)"
                   : "rgba(148, 163, 184, 0.08)"
               }
-              stroke={isLeftHighlighted ? "#3B82F6" : "#52525B"}
+              stroke={isLeftHighlighted ? "var(--color-primary)" : "#52525B"}
               strokeWidth={selectedRegion === "left" ? "4" : "2.5"}
               strokeDasharray={isLeftHighlighted ? "none" : "4,2"}
               filter={isLeftHighlighted ? "url(#glow-blue-left)" : "none"}
@@ -315,7 +334,7 @@ export function VennDiagram({
             />
           </g>
 
-          {/* CIRCLE B (Right Relation - Violet / Magenta) */}
+          {/* CIRCLE B (Right Relation) */}
           <g 
             className="cursor-pointer group transition-transform duration-200"
             onClick={() => onSelectRegion("right")}
@@ -328,10 +347,10 @@ export function VennDiagram({
               r="135"
               fill={
                 isRightHighlighted || selectedRegion === "right"
-                  ? "rgba(139, 92, 246, 0.28)"
+                  ? "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.28)"
                   : "rgba(148, 163, 184, 0.08)"
               }
-              stroke={isRightHighlighted ? "#8B5CF6" : "#52525B"}
+              stroke={isRightHighlighted ? "var(--color-accent)" : "#52525B"}
               strokeWidth={selectedRegion === "right" ? "4" : "2.5"}
               strokeDasharray={isRightHighlighted ? "none" : "4,2"}
               filter={isRightHighlighted ? "url(#glow-violet-right)" : "none"}
@@ -339,7 +358,7 @@ export function VennDiagram({
             />
           </g>
 
-          {/* INTERSECTION AREA (Cyan RGB Glow) */}
+          {/* INTERSECTION AREA */}
           <g 
             clipPath="url(#clip-circle-left)"
             className="cursor-pointer group"
@@ -353,7 +372,7 @@ export function VennDiagram({
               r="135"
               fill={
                 isIntersectionHighlighted || selectedRegion === "intersection"
-                  ? "rgba(6, 182, 212, 0.7)"
+                  ? "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.6)"
                   : "rgba(148, 163, 184, 0.12)"
               }
               filter={isIntersectionHighlighted ? "url(#glow-cyan-intersection)" : "none"}
@@ -365,7 +384,7 @@ export function VennDiagram({
           {/* LABELS & METRIC COUNTS OVERLAY (PERFECTLY CONTAINED WITHIN REGIONS) */}
           {/* ============================================================== */}
 
-          {/* LEFT CIRCLE: Table A Label & Metrics (Center of non-overlapping zone ~ x=150) */}
+          {/* LEFT CIRCLE: Table A Label & Metrics */}
           <text
             x="150"
             y="126"
@@ -385,7 +404,7 @@ export function VennDiagram({
             x="150"
             y="152"
             textAnchor="middle"
-            fill="#3B82F6"
+            fill="var(--color-primary)"
             style={{ 
               fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
               fontSize: "15px",
@@ -399,7 +418,7 @@ export function VennDiagram({
             x="150"
             y="176"
             textAnchor="middle"
-            fill="#06B6D4"
+            fill="var(--color-accent)"
             style={{ 
               fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
               fontSize: "14px",
@@ -471,7 +490,7 @@ export function VennDiagram({
             KEY EQUALITY
           </text>
 
-          {/* RIGHT CIRCLE: Table B Label & Metrics (Center of non-overlapping zone ~ x=450) */}
+          {/* RIGHT CIRCLE: Table B Label & Metrics */}
           <text
             x="450"
             y="126"
@@ -491,7 +510,7 @@ export function VennDiagram({
             x="450"
             y="152"
             textAnchor="middle"
-            fill="#8B5CF6"
+            fill="var(--color-accent)"
             style={{ 
               fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
               fontSize: "15px",
@@ -505,7 +524,7 @@ export function VennDiagram({
             x="450"
             y="176"
             textAnchor="middle"
-            fill="#06B6D4"
+            fill="var(--color-primary)"
             style={{ 
               fontFamily: 'ui-monospace, SFMono-Regular, "JetBrains Mono", Consolas, monospace',
               fontSize: "14px",

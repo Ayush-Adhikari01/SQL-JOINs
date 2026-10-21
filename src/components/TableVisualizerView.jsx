@@ -63,7 +63,9 @@ export function TableVisualizerView({
       className="flex-1 flex flex-col rounded-3xl border overflow-hidden shadow-xs transition-colors"
       style={{
         backgroundColor: "var(--bg-surface)",
-        borderColor: isLeft ? "rgba(59, 130, 246, 0.4)" : "rgba(139, 92, 246, 0.4)"
+        borderColor: isLeft 
+          ? "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.4)" 
+          : "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)"
       }}
     >
       {/* 1. Header with CSS Grid: GUARANTEES FULL RELATION TITLE IS NEVER TRUNCATED */}
@@ -83,7 +85,7 @@ export function TableVisualizerView({
             <div 
               className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-white shadow-xs flex items-center justify-center shrink-0 mt-0.5"
               style={{
-                backgroundColor: isLeft ? "#3B82F6" : "#8B5CF6"
+                backgroundColor: isLeft ? "var(--color-primary)" : "var(--color-accent)"
               }}
             >
               <Table className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -103,7 +105,7 @@ export function TableVisualizerView({
                 {title}: {table.name}
               </h3>
               <p className="text-[11px] leading-tight mt-1" style={{ color: "var(--text-muted)" }}>
-                {table.rows.length} records • Key: <strong className="font-mono font-bold" style={{ color: isLeft ? "#3B82F6" : "#8B5CF6" }}>{selectedKey || "None"}</strong>
+                {table.rows.length} records • Key: <strong className="font-mono font-bold" style={{ color: isLeft ? "var(--color-primary)" : "var(--color-accent)" }}>{selectedKey || "None"}</strong>
               </p>
             </div>
           </div>
@@ -114,8 +116,10 @@ export function TableVisualizerView({
             className="h-7 sm:h-8 px-2.5 sm:px-3 rounded-xl border text-xs font-semibold shrink-0 transition-all hover:scale-105 flex items-center space-x-1 shadow-2xs cursor-pointer"
             style={{
               backgroundColor: "var(--bg-surface)",
-              borderColor: isLeft ? "rgba(59, 130, 246, 0.5)" : "rgba(139, 92, 246, 0.5)",
-              color: isLeft ? "#60A5FA" : "#A78BFA"
+              borderColor: isLeft 
+                ? "rgba(var(--primary-r), var(--primary-g), var(--primary-b), 0.5)" 
+                : "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.5)",
+              color: isLeft ? "var(--color-primary)" : "var(--color-accent)"
             }}
             title={`Edit ${table.name} Schema & Rows`}
           >
@@ -146,7 +150,7 @@ export function TableVisualizerView({
           />
         </div>
         <div className="flex items-center space-x-1.5 shrink-0 text-[10px] sm:text-[11px] font-semibold">
-          <span className="inline-flex items-center text-cyan-400">
+          <span className="inline-flex items-center font-bold" style={{ color: "var(--semantic-match)" }}>
             <CheckCircle className="w-3 h-3 mr-0.5" /> {matchedIndices.length} matched
           </span>
           <span className="text-slate-500">•</span>
@@ -177,7 +181,7 @@ export function TableVisualizerView({
                     onClick={() => handleSort(col.name)}
                     className="p-2 font-mono cursor-pointer hover:opacity-80 transition-opacity select-none whitespace-nowrap"
                     style={{
-                      color: isKey ? (isLeft ? "#3B82F6" : "#8B5CF6") : "var(--text-main)",
+                      color: isKey ? (isLeft ? "var(--color-primary)" : "var(--color-accent)") : "var(--text-main)",
                       fontWeight: isKey ? 700 : 600
                     }}
                   >
@@ -186,7 +190,7 @@ export function TableVisualizerView({
                       {isKey && (
                         <span 
                           className="text-[9px] px-1 rounded text-white font-sans font-bold"
-                          style={{ backgroundColor: isLeft ? "#3B82F6" : "#8B5CF6" }}
+                          style={{ backgroundColor: isLeft ? "var(--color-primary)" : "var(--color-accent)" }}
                         >
                           KEY
                         </span>
@@ -214,7 +218,7 @@ export function TableVisualizerView({
                     backgroundColor: isHovered 
                       ? "var(--bg-hover)" 
                       : isMatched 
-                      ? "rgba(6, 182, 212, 0.08)" 
+                      ? "var(--semantic-match-subtle)" 
                       : isLeft 
                       ? "rgba(245, 158, 11, 0.08)" 
                       : "rgba(236, 72, 153, 0.08)"
@@ -254,7 +258,14 @@ export function TableVisualizerView({
                   })}
                   <td className="p-2 text-center whitespace-nowrap">
                     {isMatched ? (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                      <span 
+                        className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold border"
+                        style={{
+                          backgroundColor: "var(--semantic-match-subtle)",
+                          color: "var(--semantic-match)",
+                          borderColor: "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.4)"
+                        }}
+                      >
                         MATCH
                       </span>
                     ) : (

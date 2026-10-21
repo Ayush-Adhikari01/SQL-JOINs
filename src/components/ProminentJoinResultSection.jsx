@@ -97,14 +97,20 @@ export function ProminentJoinResultSection({
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <div className="px-3 py-2 rounded-2xl border text-center" style={{ backgroundColor: "var(--bg-elevated)", borderColor: "var(--border-subtle)" }}>
             <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Output</span>
-            <strong className="text-base font-black text-blue-500">{outputRowCount}</strong>
+            <strong className="text-base font-black" style={{ color: "var(--color-primary)" }}>{outputRowCount}</strong>
             <span className="text-[10px] text-slate-400 block">tuples</span>
           </div>
 
-          <div className="px-3 py-2 rounded-2xl border text-center bg-cyan-500/10 border-cyan-500/30">
-            <span className="text-[10px] uppercase font-bold text-cyan-600 dark:text-cyan-400 block">Matched</span>
-            <strong className="text-base font-black text-cyan-600 dark:text-cyan-400">{matchedCount}</strong>
-            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 block">pairs</span>
+          <div 
+            className="px-3 py-2 rounded-2xl border text-center"
+            style={{
+              backgroundColor: "var(--semantic-match-subtle)",
+              borderColor: "rgba(var(--accent-r), var(--accent-g), var(--accent-b), 0.3)"
+            }}
+          >
+            <span className="text-[10px] uppercase font-bold block" style={{ color: "var(--semantic-match)" }}>Matched</span>
+            <strong className="text-base font-black" style={{ color: "var(--semantic-match)" }}>{matchedCount}</strong>
+            <span className="text-[10px] block" style={{ color: "var(--semantic-match)" }}>pairs</span>
           </div>
 
           <div className="px-3 py-2 rounded-2xl border text-center bg-amber-500/10 border-amber-500/30">
@@ -161,9 +167,9 @@ export function ProminentJoinResultSection({
           color: "var(--text-main)"
         }}
       >
-        <Sparkles className="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" />
+        <Sparkles className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "var(--color-primary)" }} />
         <div>
-          <strong className="font-bold block text-xs uppercase tracking-wider text-cyan-500 mb-0.5">
+          <strong className="font-bold block text-xs uppercase tracking-wider mb-0.5" style={{ color: "var(--color-primary)" }}>
             Dynamic Relational Analysis:
           </strong>
           <p style={{ color: "var(--text-muted)" }}>{dynamicExplanation}</p>

@@ -53,7 +53,7 @@ export function Navbar({
                 <span style={{ color: "var(--text-main)" }}>Join Operations</span>
                 <span 
                   className="bg-clip-text text-transparent font-bold"
-                  style={{ backgroundImage: "linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899)" }}
+                  style={{ backgroundImage: "linear-gradient(135deg, var(--color-primary), var(--color-accent))" }}
                 >
                   Visualizer
                 </span>
@@ -73,11 +73,12 @@ export function Navbar({
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
                     isActive ? "text-white shadow-xs" : "hover:opacity-85"
                   }`}
                   style={{
-                    background: isActive ? "linear-gradient(135deg, #3B82F6, #8B5CF6)" : "transparent",
+                    background: isActive ? "linear-gradient(135deg, var(--color-primary), var(--color-accent))" : "transparent",
+                    boxShadow: isActive ? "0 0 14px var(--color-primary-glow)" : undefined,
                     color: isActive ? "#ffffff" : "var(--text-muted)"
                   }}
                 >

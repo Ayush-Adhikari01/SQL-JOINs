@@ -86,21 +86,52 @@ export function rgbToHex(r, g, b) {
   }).join("");
 }
 
-export function applyThemeVariables({ primary, accent, isDark }) {
+export function applyThemeVariables({ primary, accent, accent2, isDark }) {
   const root = document.documentElement;
 
-  // Set RGB component variables
+  // Set RGB component variables for Primary
   root.style.setProperty("--primary-r", String(primary.r));
   root.style.setProperty("--primary-g", String(primary.g));
   root.style.setProperty("--primary-b", String(primary.b));
   root.style.setProperty("--color-primary", `rgb(${primary.r}, ${primary.g}, ${primary.b})`);
-  root.style.setProperty("--color-primary-glow", `rgba(${primary.r}, ${primary.g}, ${primary.b}, 0.25)`);
+  root.style.setProperty("--color-primary-glow", `rgba(${primary.r}, ${primary.g}, ${primary.b}, 0.35)`);
+  root.style.setProperty("--color-primary-subtle", `rgba(${primary.r}, ${primary.g}, ${primary.b}, 0.12)`);
 
+  // Set RGB component variables for Accent (Secondary)
   root.style.setProperty("--accent-r", String(accent.r));
   root.style.setProperty("--accent-g", String(accent.g));
   root.style.setProperty("--accent-b", String(accent.b));
   root.style.setProperty("--color-accent", `rgb(${accent.r}, ${accent.g}, ${accent.b})`);
-  root.style.setProperty("--color-accent-glow", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.25)`);
+  root.style.setProperty("--color-accent-glow", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.35)`);
+  root.style.setProperty("--color-accent-subtle", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.12)`);
+
+  // Set RGB component variables for Accent2 (Tertiary)
+  const acc2 = accent2 || { r: accent.r, g: accent.g, b: accent.b, hex: accent.hex };
+  root.style.setProperty("--accent2-r", String(acc2.r));
+  root.style.setProperty("--accent2-g", String(acc2.g));
+  root.style.setProperty("--accent2-b", String(acc2.b));
+  root.style.setProperty("--color-accent2", `rgb(${acc2.r}, ${acc2.g}, ${acc2.b})`);
+  root.style.setProperty("--color-accent2-glow", `rgba(${acc2.r}, ${acc2.g}, ${acc2.b}, 0.35)`);
+
+  // Unified Dynamic Gradients reflecting active theme
+  root.style.setProperty(
+    "--theme-gradient",
+    `linear-gradient(135deg, rgb(${primary.r}, ${primary.g}, ${primary.b}), rgb(${accent.r}, ${accent.g}, ${accent.b}))`
+  );
+  root.style.setProperty(
+    "--theme-gradient-reverse",
+    `linear-gradient(135deg, rgb(${accent.r}, ${accent.g}, ${accent.b}), rgb(${primary.r}, ${primary.g}, ${primary.b}))`
+  );
+  root.style.setProperty(
+    "--theme-gradient-subtle",
+    `linear-gradient(135deg, rgba(${primary.r}, ${primary.g}, ${primary.b}, 0.14), rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.14))`
+  );
+
+  // Dynamic Semantic Mappings linked to active palette
+  root.style.setProperty("--semantic-active", `rgb(${primary.r}, ${primary.g}, ${primary.b})`);
+  root.style.setProperty("--semantic-match", `rgb(${accent.r}, ${accent.g}, ${accent.b})`);
+  root.style.setProperty("--semantic-match-glow", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.4)`);
+  root.style.setProperty("--semantic-match-subtle", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.14)`);
 
   if (isDark) {
     root.classList.add("dark");
